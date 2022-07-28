@@ -60,7 +60,7 @@ $$\begin{align*}
 Predicted covariance matrix of the state: 
 
 $$\begin{align*}
-    P_{xx}(k+1|k)   =& E\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T \\
+    P_{xx}(k+1|k)   =& E\left\\{ \left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T \right\\} \\
     =& \frac{1}{4h^2} \sum^{n_x}_{i=1} \left[\mathcal{X}_{plus,i}(k+1|k)\\
      - \mathcal{X}_{minus,i}(k+1|k)  \right]^2\\
     &+ \frac{h^2-1}{4h^2} \sum^{n_x}_{i=1} \left[\mathcal{X}_{plus,i}(k+1|k)\\
