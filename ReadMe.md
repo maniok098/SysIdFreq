@@ -17,6 +17,7 @@
  
 
 ## System desciption: 
+
 $$\begin{align}
     x(k+1)   &= f(x(k),u(k)) + w(k) \\ 
             y(k) &= Cx(k) + v(k) 
@@ -35,24 +36,22 @@ $$\begin{align}
 
 ### 2. Time-Update / Prediction
 Definítion of sigma points for x: 
+
 $$\begin{align*}
-\mathcal{X}_{0}(k+1|k) &=   
-             f\left(\hat{x}(k|k) ,u_k \right)\\
-\mathcal{X}_{plus,i}(k+1|k) &=   
-             f\left(\hat{x}(k|k) + h\cdot \left(\sqrt{P_{xx}(k|k)}\right)_i ,u_k \right),  i = 1,...,n_x\\
-\mathcal{X}_{minus,i}(k+1|k) &=
-             f\left(\hat{x}(k|k) - h\cdot \left(\sqrt{P_{xx}(k|k)}\right)_i ,u_k \right),  i = 1,...,n_x
+\mathcal{X}_{0}(k+1|k) &=  f\left(\hat{x}(k|k) ,u_k \right)\\
+\mathcal{X}_{plus,i}(k+1|k) &=   f\left(\hat{x}(k|k) + h\cdot \left(\sqrt{P_{xx}(k|k)}\right)_i ,u_k \right),  i = 1,...,n_x\\
+\mathcal{X}_{minus,i}(k+1|k) &= f\left(\hat{x}(k|k) - h\cdot \left(\sqrt{P_{xx}(k|k)}\right)_i ,u_k \right),  i = 1,...,n_x
 \end{align*}$$
+
 - $\left(\sqrt{P}\right)_i$ is the i-th coloum of Cholesky decomposition of $P$, i.e. i-th column of $S$ with $P = SS^T$
    - Notice: the result of MATLAB chol( ) command is the transpose
 
 Predicted state: 
+
 $$\begin{align*}
     \hat{x}(k+1|k)   &= \frac{h^2-n_x}{h^2} \mathcal{X}_{0}(k+1|k) \\ 
-             &+ \frac{1}{2h^2} \sum^{n_x}_{i=1} \left[
-             \mathcal{X}_{plus,i}(k+1|k)\\
-             + 
-             \mathcal{X}_{minus,i}(k+1|k)  \right]
+             &+ \frac{1}{2h^2} \sum^{n_x}_{i=1} \left[\mathcal{X}_{plus,i}(k+1|k)\\
+             + \mathcal{X}_{minus,i}(k+1|k)  \right]
 \end{align*}$$
 
 - The influence of $w_k$ is concealed, since it is indeed linear (additive after nonlinear time propogation).
@@ -60,21 +59,12 @@ $$\begin{align*}
 
 Predicted covariance matrix of the state: 
 
-
 $$\begin{align*}
-    P_{xx}(k+1|k)   =& E\left\{\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T \right\}\\
-
-    =& \frac{1}{4h^2} \sum^{n_x}_{i=1} \left[
-             \mathcal{X}_{plus,i}(k+1|k)\\
-             - 
-             \mathcal{X}_{minus,i}(k+1|k)  \right]^2
-             \\
-
-    &+ \frac{h^2-1}{4h^2} \sum^{n_x}_{i=1} \left[
-             \mathcal{X}_{plus,i}(k+1|k)\\
-             + 
-             \mathcal{X}_{minus,i}(k+1|k) 
-             - 2\mathcal{X}_{0}(k+1|k)  \right]^2 \\
+    P_{xx}(k+1|k)   =& E\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T \\
+    =& \frac{1}{4h^2} \sum^{n_x}_{i=1} \left[\mathcal{X}_{plus,i}(k+1|k)\\
+     - \mathcal{X}_{minus,i}(k+1|k)  \right]^2\\
+    &+ \frac{h^2-1}{4h^2} \sum^{n_x}_{i=1} \left[\mathcal{X}_{plus,i}(k+1|k)\\
+     + \mathcal{X}_{minus,i}(k+1|k) - 2\mathcal{X}_{0}(k+1|k)  \right]^2 \\
     & + Q(k+1)         
 \end{align*}$$
 
@@ -91,6 +81,7 @@ $$\begin{align*}
 
 ### 3.1 Measurement-Update / Correction  (linear output function)
 Predicted output:
+
 $$\begin{align*}
     \hat{y}(k+1|k)   &= C\hat{x}(k+1|k)
 \end{align*}$$
@@ -98,34 +89,35 @@ $$\begin{align*}
 
 
 Predicted cross covariance matrix:
-$$\begin{align*}
-    P_{xy}(k+1|k)   =& E\left\{\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( y(k+1) -\hat{y}(k+1|k)  \right)^T \right\}\\
 
-    =&     E\left\{\left( x(k+1) -\hat{x}(k+1|k)  \right)
-     \left(C (x(k+1) -\hat{x}(k+1|k)) + v(k+1)  \right)^T \right\}\\
-    =&     E\left\{\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T \right\}C^T \\
-    & +  E\left\{\left( x(k+1) -\hat{x}(k+1|k)  \right)v(k+1)^T \right\} \\
-    =& E\left\{\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T \right\}C^T \\
+$$\begin{align*}
+    P_{xy}(k+1|k)   =& E\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( y(k+1) -\hat{y}(k+1|k)  \right)^T \\
+    =&     E\left( x(k+1) -\hat{x}(k+1|k)  \right)
+     \left(C (x(k+1) -\hat{x}(k+1|k)) + v(k+1)  \right)^T \\
+    =&     E\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T C^T \\
+    & +  E\left( x(k+1) -\hat{x}(k+1|k)  \right)v(k+1)^T  \\
+    =& E\left( x(k+1) -\hat{x}(k+1|k)  \right)\left( x(k+1) -\hat{x}(k+1|k)  \right)^T C^T \\
     =& P_{xx}(k+1|k)C^T
-    
 \end{align*}$$
 
 Predicted covariance matrix of the output:
+
 $$\begin{align*}
-    P_{yy}(k+1|k)   =& E\left\{\left( y(k+1) -\hat{y}(k+1|k)  \right)\left( y(k+1) -\hat{y}(k+1|k)  \right)^T \right\}\\
+    P_{yy}(k+1|k)   =& E\left( y(k+1) -\hat{y}(k+1|k)  \right)\left( y(k+1) -\hat{y}(k+1|k)  \right)^T \\
     =& CP_{xx}(k+1|k)C^T + R(k+1)
-    
 \end{align*}$$
  - The derivation is trivial :-)
 
 
 Correction gain: 
+
 $$\begin{align*}
     K(k+1)   = P_{xy}(k+1|k) P^{-1}_{yy}(k+1|k)
 \end{align*}$$
 
 
 Corrected esimation: 
+
 $$\begin{align*}
     \hat{x}(k+1|k+1)   &= \hat{x}(k+1|k) + K(k+1)\left( y(k+1) - \hat{y}(k+1|k) \right) \\
     P_{xx}(k+1|k+1) &= P_{xx}(k+1|k) - K(k+1)P_{yy}(k+1|k)K(k+1)^T
@@ -137,6 +129,7 @@ $$\begin{align*}
 Nonlinear output function: $y(k) = g(x(k)) + v(k)$
 
 Definítion of sigma points for y: 
+
 $$\begin{align*}
 \mathcal{Y}_{0}(k+1|k) &=   
              g\left(\hat{x}(k+1|k) \right)\\
@@ -145,11 +138,13 @@ $$\begin{align*}
 \mathcal{Y}_{minus,i}(k+1|k) &=
              g\left(\hat{x}(k+1|k) - h\cdot \left(\sqrt{P_{xx}(k+1|k)}\right)_i  \right),  i = 1,...,n_y
 \end{align*}$$
+
 - $\left(\sqrt{P}\right)_i$ is the i-th coloum of Cholesky decomposition of $P$, i.e. i-th column of $S$ with $P = SS^T$
    - Notice: the result of MATLAB chol( ) command is the transpose
 
 
 Predicted output:
+
 $$\begin{align*}
     \hat{y}(k+1|k)   &= \frac{h^2-n_x}{h^2} \mathcal{Y}_{0}(k+1|k) \\ 
              &+ \frac{1}{2h^2} \sum^{n_x}_{i=1} \left[
@@ -162,27 +157,27 @@ $$\begin{align*}
 
 
 Predicted cross covariance matrix:
+
 $$\begin{align*}
     P_{xy}(k+1|k)   = \frac{1}{2h} \sqrt{P_{xx}(k+1|k)} 
     \left(\mathcal{Y}_{plus,1:n_y}(k+1|k)) - \mathcal{Y}_{minus,1:n_y}(k+1|k) \right)^T    
 \end{align*}$$
 
 Predicted covariance matrix of the output:
+
 $$\begin{align*}
-    P_{yy}(k+1|k)   =& E\left\{\left( y(k+1) -\hat{y}(k+1|k)  \right)\left( y(k+1) -\hat{y}(k+1|k)  \right)^T \right\}\\
+    P_{yy}(k+1|k)   =& E\left( y(k+1) -\hat{y}(k+1|k)  \right)\left( y(k+1) -\hat{y}(k+1|k)  \right)^T \\
     =& \frac{1}{4h^2} \sum^{n_x}_{i=1} \left[
              \mathcal{Y}_{plus,i}(k+1|k)\\
              - 
              \mathcal{Y}_{minus,i}(k+1|k)  \right]^2
              \\
-
     &+ \frac{h^2-1}{4h^2} \sum^{n_x}_{i=1} \left[
              \mathcal{Y}_{plus,i}(k+1|k)\\
              + 
              \mathcal{Y}_{minus,i}(k+1|k) 
              - 2\mathcal{Y}_{0}(k+1|k)  \right]^2 \\
     & + R(k+1) 
-    
 \end{align*}$$
 
 ```sh
@@ -194,12 +189,14 @@ $$\begin{align*}
 ```
 
 Correction gain: 
+
 $$\begin{align*}
     K(k+1)   = P_{xy}(k+1|k) P^{-1}_{yy}(k+1|k)
 \end{align*}$$
 
 
 Corrected esimation: 
+
 $$\begin{align*}
     \hat{x}(k+1|k+1)   &= \hat{x}(k+1|k) + K(k+1)\left( y(k+1) - \hat{y}(k+1|k) \right) \\
     P_{xx}(k+1|k+1) &= P_{xx}(k+1|k) - K(k+1)P_{yy}(k+1|k)K(k+1)^T
